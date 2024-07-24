@@ -38,3 +38,21 @@ func PrintQueryResults(rows *sql.Rows) error {
 
 	return rows.Err()
 }
+
+func GetTables(db *sql.DB) ([]string, error) {
+	rows, err := db.Query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tables []string
+	for rows.Next() {
+		var tableName string
+		if err := rows.Scan(&tableName); err != nil {
+			return nil, err
+		}
+		tables = append(tables, tableName)
+	}
+	return tables, nil
+}
